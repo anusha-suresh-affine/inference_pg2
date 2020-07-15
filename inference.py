@@ -8,8 +8,10 @@ from db_interaction import *
 from classification import classification
 from objectdet import obj_detection
 #load classification model
+print('Loading classification model')
 classify = load_model('classification')
 #load object detection model
+print('Loading object det model')
 detect = load_model('object_detect')
 
 
@@ -37,23 +39,34 @@ def save_classification_results(result, image_id):
 	result_details = {
 		'image_id': image_id,
 		'is_defective': result['is_defective'],
-		'confidence': result['confidence'],
+		'confidence': float(result['confidence']),
 		'time': datetime.datetime.now()
 	}
 	image_classification = save_details(ImageClassification, result_details)
 
 
 def save_defect_results(result, image_id):
-	defect_results = {}
-	defect_results['image_id'] = image_id
-	defect_types = ['contamination', 'tear', 'trim', 'wrinkle', 'mistracking']
-	for field in result.keys():
-		if field=='defects':
-			for key, val in result[field].items():
-				defect_results[field+'_'+key] = val
-		else:
-			defect_results[field] = result[field]
-	defect_id = save_details(Defect, defect_results)
+	try:
+		defect_results = {}
+		defect_results['image_id'] = image_id
+		defect_types = ['contamination', 'tear', 'trim', 'wrinkle', 'mistracking']
+		for field in result.keys():
+			if field=='defects':
+				for key in result[field].keys():
+					for k, v in result[field][key].items():
+						if not k == 'confidence': 
+							defect_results[key+'_'+k] = v
+						else:
+							defect_results[key+'_'+k] = float(v)
+			else:
+				if field == 'total_defective_area':
+					defect_results[field] = float(result[field])
+				else:
+					defect_results[field] = result[field]
+		defect_id = save_details(Defect, defect_results)
+	except Exception as e:
+		print(str(e))
+		import pdb; pdb.set_trace()
 
 
 #start
@@ -69,7 +82,7 @@ while(1):
 				save_image_details(image)
 				image_stored = query_last(Image,{'name': image})
 				# import pdb; pdb.set_trace()
-				input_folder = '/home/affine/Noclass/'
+				input_folder = 'C:\\Users\\anusha\\input'
 				classification_results = classification(image, classify, input_folder)
 				save_classification_results(classification_results[image], image_stored.id)
 				if classification_results[image]['is_defective']:
