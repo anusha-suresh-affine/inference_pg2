@@ -2,6 +2,7 @@ import os
 print(os.getcwd())
 import time
 import datetime
+import cv2
 from load_model import load_model
 from historian import get_images, store_image
 from db_interaction import *
@@ -13,6 +14,8 @@ classify = load_model('classification')
 #load object detection model
 print('Loading object det model')
 detect = load_model('object_detect')
+# cwd = os.getcwd()
+output_images = 'output_images'
 
 
 def get_pc_id(image_name):
@@ -29,7 +32,7 @@ def save_image_details(image_name):
 	image_details = {
 		'name': image_name,
 		'time': datetime.datetime.now(),
-		'product_camera': pc
+		'product_camera_id': pc
 	}
 	image_id = save_details(Image, image_details)
 	return image_id
@@ -88,7 +91,8 @@ while(1):
 				if classification_results[image]['is_defective']:
 					print('defective image processing')
 					obj_det_result,img = obj_detection(image, detect, input_folder)
-					obj_det_result[image]['image_path'] = image
+					cv2.imwrite(os.path.join(output_images, image), img)
+					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
 					save_defect_results(obj_det_result[image], image_stored.id)
 					# img write to ge historian
 			except Exception as e:
