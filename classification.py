@@ -47,7 +47,7 @@ def classification(image, model, input_folder):
     except Exception:
         logger.info("Image is not processed for classification model: " + image, exc_info=True, stack_info=True)
     report_dict[image] ={'is_defective': True if resp[0][0] <= 0.5 else False,\
-                                                        'confidence': round(resp[0][0], 4)}
+                                                        'confidence': float(round(resp[0][0], 4))}
 
     return report_dict
     
