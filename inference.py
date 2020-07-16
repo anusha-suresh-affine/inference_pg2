@@ -17,6 +17,19 @@ detect = load_model('object_detect')
 # cwd = os.getcwd()
 output_images = 'output_images'
 
+import logging
+logger = logging.getLogger('inference')
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s: %(asctime)s: %(message)s')
+fh = logging.FileHandler('inference.log')
+fh.setLevel(logging.DEBUG)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 def get_pc_id(image_name):
 	camera_name = image_name.split('_')[0]
@@ -73,38 +86,42 @@ def save_defect_results(result, image_id):
 
 
 #start
+logger.info('Starting the persisitant loop')
 while(1):
-	print('starting iteration')
+	logger.info('Starting an iteration')
 	timestamp_start = datetime.datetime.now()
-	#query ge historian 
+	#query ge historian
+    logger.info('Getting images')	
 	images = get_images('eneno')
+	logger.info('Found ' + str(len(images)) + ' images')
 	if images:
 		for image in images:
 			try:
-				# import pdb; pdb.set_trace()
+				logger.info('Saving image details')
 				save_image_details(image)
 				image_stored = query_last(Image,{'name': image})
-				# import pdb; pdb.set_trace()
+				logger.info('The id of the saved image is: ' + str(image_stored.id))
 				input_folder = 'C:\\Users\\anusha\\input'
+				logger.info('Starting classification')
 				classification_results = classification(image, classify, input_folder)
+				logger.info('Saving classification results')
 				save_classification_results(classification_results[image], image_stored.id)
 				if classification_results[image]['is_defective']:
-					print('defective image processing')
+					loggger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, input_folder)
 					cv2.imwrite(os.path.join(output_images, image), img)
 					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
+					logger.info('saving defects')
 					save_defect_results(obj_det_result[image], image_stored.id)
-					# img write to ge historian
+					# to do: img write to ge historian
 			except Exception as e:
-				print('ERRORRRRRRRRRRRRR!!')
-				print(str(e))
+				logger.error(str(e))
 	if timestamp_start + datetime.timedelta(seconds=15) > datetime.datetime.now():
 		seconds = (timestamp_start + datetime.timedelta(seconds=15) - datetime.datetime.now()).total_seconds()
-		print('waiting ' + str(seconds))
+		logger.info('waiting ' + str(seconds))
 		if seconds>0:
 			time.sleep(seconds)
-	print('one iteration done')
-	break
+	logger.info('one iteration done')
 
 
 
