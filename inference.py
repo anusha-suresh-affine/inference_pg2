@@ -90,8 +90,7 @@ logger.info('Starting the persisitant loop')
 while(1):
 	logger.info('Starting an iteration')
 	timestamp_start = datetime.datetime.now()
-	#query ge historian
-    logger.info('Getting images')	
+	logger.info('Getting images')	
 	images = get_images('eneno')
 	logger.info('Found ' + str(len(images)) + ' images')
 	if images:
@@ -107,7 +106,7 @@ while(1):
 				logger.info('Saving classification results')
 				save_classification_results(classification_results[image], image_stored.id)
 				if classification_results[image]['is_defective']:
-					loggger.info('Image was found to be defective. Starting object detection')
+					logger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, input_folder)
 					cv2.imwrite(os.path.join(output_images, image), img)
 					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
@@ -122,6 +121,7 @@ while(1):
 		if seconds>0:
 			time.sleep(seconds)
 	logger.info('one iteration done')
+	break
 
 
 
