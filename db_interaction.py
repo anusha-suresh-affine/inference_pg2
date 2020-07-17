@@ -1,12 +1,12 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import create_engine, MetaData, Column, String, Table
 from sqlalchemy.orm import Session
+from configuration import *
 
 Base = automap_base()
 
-# dbPath = 'C:\\Users\\anusha\\pg_phase2\\db.sqlite3'
-# engine = create_engine('sqlite:///%s' % dbPath, echo=True)
-engine = create_engine('mysql+pymysql://' + 'root:test@123' + '@127.0.0.1:3306/'+'pg_realtime')
+engine = create_engine('sqlite:///%s' % dbPath, echo=True)
+# engine = create_engine('mysql+pymysql://' + 'root:test@123' + '@127.0.0.1:3306/'+'pg_realtime')
     
 metadata = MetaData(engine)
 Base = automap_base()

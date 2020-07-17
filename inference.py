@@ -16,6 +16,7 @@ print('Loading object det model')
 detect = load_model('object_detect')
 # cwd = os.getcwd()
 output_images = 'output_images'
+from configuration import *
 
 import logging
 logger = logging.getLogger('inference')
@@ -100,7 +101,6 @@ while(1):
 				save_image_details(image)
 				image_stored = query_last(Image,{'name': image})
 				logger.info('The id of the saved image is: ' + str(image_stored.id))
-				input_folder = 'C:\\Users\\anusha\\input'
 				logger.info('Starting classification')
 				classification_results = classification(image, classify, input_folder)
 				logger.info('Saving classification results')
