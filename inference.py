@@ -4,7 +4,7 @@ import time
 import datetime
 import cv2
 from load_model import load_model
-from historian import get_images, store_image
+#from historian import get_images, store_image
 from db_interaction import *
 from classification import classification
 from objectdet import obj_detection
@@ -30,6 +30,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+os.environ['TZ'] = 'Europe/Berlin'
 
 
 def get_pc_id(image_name):
@@ -82,9 +83,25 @@ def save_defect_results(result, image_id):
 					defect_results[field] = result[field]
 		defect_id = save_details(Defect, defect_results)
 	except Exception as e:
-		print(str(e))
-		import pdb; pdb.set_trace()
+		logger.error(str(e))
 
+
+def get_images():
+	date = datetime.datetime.now().strftime('%d-%m-%Y')
+	dated_input = os.path.join(input_folder, date)
+	logger.info('Reading images from ' + dated_input)
+	images = [x for x in os.listdir(dated_input) if check_if_created_before(x)]
+	return images
+
+def store_image(data, image_name, path):
+	cv2.imwrite(os.path.join(path, image_name), data)
+	
+def check_if_created_before(file):
+	stat = os.stat(os.path.join(input_folder, file))
+	if time.time() - stat.st_ctime <= 15:
+		return True
+	else:
+		return False
 
 #start
 logger.info('Starting the persisitant loop')
@@ -92,7 +109,7 @@ while(1):
 	logger.info('Starting an iteration')
 	timestamp_start = datetime.datetime.now()
 	logger.info('Getting images')	
-	images = get_images('eneno')
+	images = get_images()
 	logger.info('Found ' + str(len(images)) + ' images')
 	if images:
 		for image in images:
@@ -108,7 +125,7 @@ while(1):
 				if classification_results[image]['is_defective']:
 					logger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, input_folder)
-					cv2.imwrite(os.path.join(output_images, image), img)
+					store_image(img, image, output_images)
 					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
 					logger.info('saving defects')
 					save_defect_results(obj_det_result[image], image_stored.id)
@@ -121,7 +138,7 @@ while(1):
 		if seconds>0:
 			time.sleep(seconds)
 	logger.info('one iteration done')
-	break
+
 
 
 
