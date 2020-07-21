@@ -1,8 +1,9 @@
 import os
 import datetime
+from configuration import *
 
 def get_images(timestamp):
-	input_folder = 'C:\\Users\\anusha\\input'
+	# input_folder = 'C:\\Users\\anusha\\input'
 	return os.listdir(input_folder)
 
 def store_image(details):

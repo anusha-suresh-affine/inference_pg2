@@ -121,7 +121,7 @@ while(1):
 		if seconds>0:
 			time.sleep(seconds)
 	logger.info('one iteration done')
-	break
+	# break
 
 
 
