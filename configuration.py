@@ -1,2 +1,2 @@
-input_folder = 'C:\\Users\\anusha\\input'
-dbPath = 'C:\\Users\\anusha\\pg_phase2\\db.sqlite3'
+input_folder = 'D:\\PG_Germany\\Input'
+dbPath = 'D:\\PG_Germany\\GitHub\\pg__phase2_backend\\pg_phase2\\db.sqlite3'
