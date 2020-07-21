@@ -1,3 +1,2 @@
-input_folder = 'C:\\Users\\anusha\\input'
-dbPath = 'C:\\Users\\anusha\\pg_phase2\\db.sqlite3'
-output_folder = 'output_images'
+input_folder = 'C:\\Users\\affine\\Downloads\\input'
+dbPath = 'C:\\Users\\affine\\Desktop\\pg__phase2-master\\pg__phase2-master\\pg_phase2\\db.sqlite3'
