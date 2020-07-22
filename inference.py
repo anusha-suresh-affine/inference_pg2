@@ -90,14 +90,16 @@ def get_images():
 	date = datetime.datetime.now().strftime('%d-%m-%Y')
 	dated_input = os.path.join(input_folder, date)
 	logger.info('Reading images from ' + dated_input)
-	images = [x for x in os.listdir(dated_input) if check_if_created_before(x)]
-	return images
+	images = [x for x in os.listdir(dated_input) if check_if_created_before(x, dated_input)]
+	return images, dated_input
 
 def store_image(data, image_name, path):
+	logger.info("Storing the defective image: " + image_name)
 	cv2.imwrite(os.path.join(path, image_name), data)
 	
-def check_if_created_before(file):
-	stat = os.stat(os.path.join(input_folder, file))
+def check_if_created_before(file, file_path):
+	stat = os.stat(os.path.join(file_path, file))
+	logger.info("Created " + str(time.time() - stat.st_ctime) + " seconds ago")
 	if time.time() - stat.st_ctime <= 15:
 		return True
 	else:
@@ -109,7 +111,7 @@ while(1):
 	logger.info('Starting an iteration')
 	timestamp_start = datetime.datetime.now()
 	logger.info('Getting images')	
-	images = get_images()
+	images, image_path = get_images()
 	logger.info('Found ' + str(len(images)) + ' images')
 	if images:
 		for image in images:
@@ -119,12 +121,12 @@ while(1):
 				image_stored = query_last(Image,{'name': image})
 				logger.info('The id of the saved image is: ' + str(image_stored.id))
 				logger.info('Starting classification')
-				classification_results = classification(image, classify, input_folder)
+				classification_results = classification(image, classify, image_path)
 				logger.info('Saving classification results')
 				save_classification_results(classification_results[image], image_stored.id)
 				if classification_results[image]['is_defective']:
 					logger.info('Image was found to be defective. Starting object detection')
-					obj_det_result,img = obj_detection(image, detect, input_folder)
+					obj_det_result,img = obj_detection(image, detect, image_path)
 					store_image(img, image, output_images)
 					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
 					logger.info('saving defects')
