@@ -35,19 +35,22 @@ def classification(image, model, input_folder):
 
     """
     logger.info("Image classification started")
-    logger.info("Loading Image classification model")
-
+    
     report_dict = {}
+
+    logger.info("Loading Image from folder")
     ij = mpimg.imread(os.path.join(input_folder, image))
+    logger.info("Processing Image : Resize")
     np_image = np.array(ij).astype('float32')/255
     np_image = transform.resize(np_image, (512, 512, 3))
     np_image = np.expand_dims(np_image, axis=0)
     try:
         resp = model.predict(np_image)
+        logger.info("Classification Prediction Done")
     except Exception:
-        logger.info("Image is not processed for classification model: " + image, exc_info=True, stack_info=True)
+        logger.info("Image is not processed for classification model: " + image, exc_info=True, stack_info=True)    
     report_dict[image] ={'is_defective': True if resp[0][0] <= 0.5 else False,\
-                                                        'confidence': round(resp[0][0], 4)}
+                                                        'confidence': float(round(resp[0][0], 4))}
 
     return report_dict
     
