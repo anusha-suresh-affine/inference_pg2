@@ -88,10 +88,13 @@ def save_defect_results(result, image_id):
 
 def get_images():
 	date = datetime.datetime.now().strftime('%Y_%m_%d')
-	dated_input = os.path.join(input_folder, date)
-	logger.info('Reading images from ' + dated_input)
-	images = [x for x in os.listdir(dated_input) if check_if_created_before(x, dated_input)]
-	return images, dated_input
+	try:
+		dated_input = os.path.join(input_folder, date)
+		logger.info('Reading images from ' + dated_input)
+		images = [x for x in os.listdir(dated_input) if check_if_created_before(x, dated_input)]
+		return images, dated_input
+	except:
+		return [], input_folder
 
 def store_image(data, image_name, path):
 	logger.info("Storing the defective image: " + image_name)
@@ -109,7 +112,8 @@ def check_if_created_before(file, file_path):
 logger.info('Starting the persisitant loop')
 while(1):
 	logger.info('Starting an iteration')
-	timestamp_start = datetime.datetime.now()
+	#timestamp_start = datetime.datetime.now()
+	timestamp_start = time.time()
 	logger.info('Getting images')	
 	images, image_path = get_images()
 	logger.info('Found ' + str(len(images)) + ' images')
@@ -134,8 +138,9 @@ while(1):
 					# to do: img write to ge historian
 			except Exception as e:
 				logger.error(str(e))
-	if timestamp_start + datetime.timedelta(seconds=15) > datetime.datetime.now():
-		seconds = (timestamp_start + datetime.timedelta(seconds=15) - datetime.datetime.now()).total_seconds()
+	#if datetime.datetime.now() - timestamp_start > datetime.timedelta(seconds>15):
+	if time.time() - timestamp_start < 15:
+		seconds = 15 - (time.time() - timestamp_start)
 		logger.info('waiting ' + str(seconds))
 		if seconds>0:
 			time.sleep(seconds)
