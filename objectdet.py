@@ -172,7 +172,7 @@ def obj_detection(image, model, input_folder):
     """
     # Read the graph.
     logger.info("Object detection model started")
-    logger.info("Loading object detection model")
+    
     cnt = 0  # unknown image count tracker
 
     report_dict = {}
@@ -194,9 +194,11 @@ def obj_detection(image, model, input_folder):
     draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     
     # add gamma corection
+    logger.info("Adding Gamma Correction")
     img = adjust_gamma(img)
 
     # preprocess image for network
+    logger.info("Image Pre Processing")
     img = preprocess_image(img)
     img, scale = resize_image(img, 600, 1000)
 
@@ -236,7 +238,7 @@ def obj_detection(image, model, input_folder):
         try:
             logger.info("Appending existing value for: " + image)
             report_dict[image]["defects"].update({defect_class: {"area": compute_bbox_area(box) + report_dict[image] \
-                ["defects"][defect_class]["area"], "confidence": score + report_dict[image]["defects"][defect_class] \
+                ["defects"][defect_class]["area"], "confidence": score*100 + report_dict[image]["defects"][defect_class] \
                 ["confidence"], "count": 1 + report_dict[image]["defects"][defect_class]["count"]}})
         except KeyError:
             logger.info("Creating Dictionary for : " + image)
@@ -259,6 +261,7 @@ def obj_detection(image, model, input_folder):
         all_boxes = list(itertools.chain.from_iterable(all_bboxes))
         # report_dict, cnt = obj_helper(report_dict, im, draw, image, defect_c, output_folder, all_boxes, cnt)
 
+        logger.info("Updating Area and defct index")
         if defect_c:                  # update defect area, total area, defect index for known defects
             report_dict, cnt, im = obj_helper(report_dict, im, draw, image, defect_c, all_boxes, cnt)
             for d in defect_c:
