@@ -235,14 +235,16 @@ def obj_detection(image, model, input_folder):
         defect_c.add(defect_class)
         bboxes[defect_class].append([box[0], box[1], box[2], box[3]])
 
+        score *= 100
+        
         try:
             logger.info("Appending existing value for: " + image)
             report_dict[image]["defects"].update({defect_class: {"area": compute_bbox_area(box) + report_dict[image] \
-                ["defects"][defect_class]["area"], "confidence": score*100 + report_dict[image]["defects"][defect_class] \
+                ["defects"][defect_class]["area"], "confidence": score + report_dict[image]["defects"][defect_class] \
                 ["confidence"], "count": 1 + report_dict[image]["defects"][defect_class]["count"]}})
         except KeyError:
             logger.info("Creating Dictionary for : " + image)
-            report_dict[image]["defects"].update({defect_class: {"area": compute_bbox_area(box), "confidence": score * 100,\
+            report_dict[image]["defects"].update({defect_class: {"area": compute_bbox_area(box), "confidence": score,\
                                                                 "count": 1}})
         try:
             logger.info("creating bounding boxes for : " + image)
