@@ -42,12 +42,13 @@ def get_pc_id(image_name):
 	return pc.id
 
 
-def save_image_details(image_name):
+def save_image_details(image_name, image_path):
 	pc = get_pc_id(image_name)
 	image_details = {
 		'name': image_name,
 		'time': datetime.datetime.now(),
-		'product_camera_id': pc
+		'product_camera_id': pc,
+		'image_path': image_path,
 	}
 	image_id = save_details(Image, image_details)
 	return image_id
@@ -121,7 +122,7 @@ while(1):
 		for image in images:
 			try:
 				logger.info('Saving image details')
-				save_image_details(image)
+				save_image_details(image, image_path)
 				image_stored = query_last(Image,{'name': image})
 				logger.info('The id of the saved image is: ' + str(image_stored.id))
 				logger.info('Starting classification')
