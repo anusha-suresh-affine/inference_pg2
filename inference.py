@@ -73,10 +73,10 @@ def save_defect_results(result, image_id):
 			if field=='defects':
 				for key in result[field].keys():
 					for k, v in result[field][key].items():
-						if not k == 'confidence': 
-							defect_results[key+'_'+k] = v
-						else:
+						if k == 'confidence' or k == 'area': 
 							defect_results[key+'_'+k] = float(v)
+						else:
+							defect_results[key+'_'+k] = v
 			else:
 				if field == 'total_defective_area':
 					defect_results[field] = float(result[field])
