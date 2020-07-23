@@ -87,7 +87,7 @@ def save_defect_results(result, image_id):
 
 
 def get_images():
-	date = datetime.datetime.now().strftime('%d-%m-%Y')
+	date = datetime.datetime.now().strftime('%Y_%m_%d')
 	dated_input = os.path.join(input_folder, date)
 	logger.info('Reading images from ' + dated_input)
 	images = [x for x in os.listdir(dated_input) if check_if_created_before(x, dated_input)]
