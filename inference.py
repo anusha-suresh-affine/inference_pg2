@@ -133,7 +133,7 @@ while(1):
 					logger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, image_path)
 					store_image(img, image, output_images)
-					obj_det_result[image]['image_path'] = os.path.join(output_images, image)
+					obj_det_result[image]['image_path'] = os.path.join(output_folder, image)
 					logger.info('saving defects')
 					save_defect_results(obj_det_result[image], image_stored.id)
 					# to do: img write to ge historian
