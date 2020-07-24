@@ -1,5 +1,5 @@
 import os
-print(os.getcwd())
+# print(os.getcwd())
 import time
 import datetime
 import cv2
@@ -35,7 +35,7 @@ os.environ['TZ'] = 'Europe/Berlin'
 
 def get_pc_id(image_name):
 	camera_name = image_name.split('_')[0]
-	print('Querying for camera_name: ' + camera_name)
+	logger.info('Querying for camera_name: ' + camera_name)
 	camera = query_filter(Camera, {'name': camera_name})
 	camera = camera[0]
 	pc = query_last(ProductCamera, {'camera_id': camera.id})
@@ -133,7 +133,7 @@ while(1):
 					logger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, image_path)
 					store_image(img, image, output_images)
-					obj_det_result[image]['image_path'] = os.path.join(os.getcwd(), 'output_images', image)
+					obj_det_result[image]['image_path'] = os.path.join(output_images, image)
 					logger.info('saving defects')
 					save_defect_results(obj_det_result[image], image_stored.id)
 					# to do: img write to ge historian
