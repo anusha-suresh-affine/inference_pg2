@@ -1,2 +1,2 @@
 input_folder = 'D:\\PG_Germany\\Input'
-output_folder = "output_images"
+output_folder = 'D:\\PG_Germany\\Output'
