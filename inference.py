@@ -15,8 +15,8 @@ classify = load_model('classification')
 print('Loading object det model')
 detect = load_model('object_detect')
 # cwd = os.getcwd()
-output_images = 'output_images'
 from configuration import *
+output_images = output_folder
 
 import logging
 logger = logging.getLogger('inference')
