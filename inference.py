@@ -91,6 +91,7 @@ def get_images():
 	date = datetime.datetime.now().strftime('%Y_%m_%d')
 	try:
 		dated_input = os.path.join(input_folder, date)
+		#dated_input = os.path.join(input_folder, date, 'Prodigy_S3[]\\VISUCI1')
 		logger.info('Reading images from ' + dated_input)
 		images = [x for x in os.listdir(dated_input) if check_if_created_before(x, dated_input)]
 		return images, dated_input
