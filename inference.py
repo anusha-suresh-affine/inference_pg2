@@ -1,3 +1,4 @@
+import os
 import logging
 logger = logging.getLogger('inference')
 logger.setLevel(logging.DEBUG)
@@ -12,7 +13,6 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 os.environ['TZ'] = 'Europe/Berlin'
 
-import os
 # print(os.getcwd())
 import time
 import datetime
