@@ -29,7 +29,10 @@ def save_details(table, details):
 	for key, value in details.items():
 		setattr(new_row, key, value)
 	session.add(new_row)
-	session.commit()
+	try:
+		session.commit()
+	except Exception as e:
+		session.rollback()
 
 
 
