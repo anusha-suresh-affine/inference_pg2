@@ -3,19 +3,19 @@ import time
 import datetime
 import cv2
 import pdb
+import logging
+
 from load_model import load_model
 from db_interaction import *
 from classification import classification
 from objectdet import obj_detection
+from configuration import *
+
 #load classification model
 classify = load_model('classification')
 #load object detection model
 detect = load_model('object_detect')
-cwd = os.getcwd()
-from configuration import *
-output_images = output_folder
 
-import logging
 logger = logging.getLogger('inference')
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(levelname)s: %(asctime)s: %(message)s')
@@ -28,7 +28,6 @@ ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 os.environ['TZ'] = 'Europe/Berlin'
-
 
 
 def get_pc_id(image_name):
@@ -91,10 +90,12 @@ def get_images(image_list):
 		dated_input = os.path.join(input_folder, date, input_folder_ext)
 		logger.info('Reading images from ' + dated_input)
 		start_delta = time.time()
-		delta_images = list(set(os.listdir(dated_input)) - set(image_list))
+		all_images = os.listdir(dated_input)
+		delta_images = list(set(all_images) - set(image_list))
 		delta_time = time.time() - start_delta
 		logger.info('Delta took ' + str(delta_time))
 		logger.info(str(delta_images))
+		image_list = all_images
 		return delta_images, dated_input, image_list
 	except Exception as e:
 		logger.error(str(e))
@@ -104,21 +105,17 @@ def store_image(data, image_name, path):
 	logger.info("Storing the defective image: " + image_name)
 	cv2.imwrite(os.path.join(path, image_name), data)
 
-def check_if_created_before(file, file_path, time_stamp):
-	print(time_stamp)
-	stat = os.stat(os.path.join(file_path, file))
-	logger.info("Created " + str(time.time() - stat.st_mtime) + " seconds ago")
-	if stat.st_mtime > time_stamp:
-		logger.info(str(stat.st_mtime) + ">" + str(time_stamp))
-		return True
-	else:
-		return False
 
 #start
-date = datetime.datetime.now().strftime('%Y_%m_%d')
-dated_input = os.path.join(input_folder, date, input_folder_ext)
-image_list = os.listdir(dated_input)
 logger.info('Starting the persisitant loop')
+try:
+	today = datetime.datetime.now().strftime('%Y_%m_%d')
+	read_folder = os.path.join(input_folder, today, input_folder_ext)
+	image_list = os.listdir(read_folder)
+except Exception as e:
+	image_list = []
+	logger.error(str(e))
+
 while(1):
 	logger.info('Starting an iteration')
 	timestamp_start = time.time()
@@ -139,15 +136,15 @@ while(1):
 				if classification_results[image]['is_defective']:
 					logger.info('Image was found to be defective. Starting object detection')
 					obj_det_result,img = obj_detection(image, detect, image_path)
-					store_image(img, image, output_images)
+					store_image(img, image, output_folder)
 					obj_det_result[image]['image_path'] = os.path.join(output_folder, image)
 					logger.info('saving defects')
 					save_defect_results(obj_det_result[image], image_stored.id)
 					# to do: img write to ge historian
 			except Exception as e:
 				logger.error(str(e))
-	if time.time() - timestamp_start < 30:
-		seconds = 30 - (time.time() - timestamp_start)
+	if time.time() - timestamp_start < 15:
+		seconds = 15 - (time.time() - timestamp_start)
 		logger.info('waiting ' + str(seconds))
 		if seconds > 0:
 			time.sleep(seconds)
