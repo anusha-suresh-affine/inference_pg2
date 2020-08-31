@@ -65,10 +65,10 @@ def query_filter(table, arguments):
 
 
 def query_last(table, arguments):
-	ogger.info('Querying ' + table + 'for ' + arguments)
+	logger.info('Querying ' + table + 'for ' + arguments)
 	queries = session.query(table).filter_by(**arguments)
 	return queries[-1]
 
 def query_first(table, arguments):
-	ogger.info('Querying ' + table + 'for ' + arguments)
+	logger.info('Querying ' + table + 'for ' + arguments)
 	return session.query(table).filter_by(**arguments).first()

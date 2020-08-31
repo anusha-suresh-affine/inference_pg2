@@ -8,8 +8,7 @@ Base = automap_base()
 
 # dbPath = 'C:\\Users\\affine\\Desktop\\pg__phase2-master\\pg__phase2-master\\pg_phase2\\db.sqlite3'
 # engine = create_engine('sqlite:///%s' % dbPath, echo=True)
-# engine = create_engine('mysql+pymysql://' + 'affine:affine123$' + '@127.0.0.1:3306/'+'pg_realtime')
-engine = create_engine('mysql+pymysql://' + 'affine:affine123$' + '@127.0.0.1:3306/'+'pg_realtime', pool_pre_ping=True)
+engine = create_engine('mysql+pymysql://' + 'affine:affine123$' + '@127.0.0.1:3306/'+'pg_realtime')
 
 metadata = MetaData(engine)
 Base = automap_base()
